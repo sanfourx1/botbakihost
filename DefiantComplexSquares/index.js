@@ -8,6 +8,8 @@ const client = new Client({
 const OWNER_ID = process.env.OWNER_ID;
 const AUTO_REACT_IDS = (process.env.AUTO_REACT_IDS || '').split(',').filter(id => id);
 
+let mentionReplyEnabled = true; // Toggle for auto-reply when mentioned
+
 client.on('ready', () => {
     console.log(`✅ Logged in as ${client.user.tag}`);
 
@@ -65,7 +67,7 @@ client.on('messageCreate', async (message) => {
     }
 
     // Auto-reply if mentioned
-    if (message.mentions.has(client.user)) {
+    if (mentionReplyEnabled && message.mentions.has(client.user)) {
         await message.reply(`${message.author.tag} 3endek ratakel ma3endekx maratakelx`);
     }
 });
@@ -105,6 +107,12 @@ client.on('messageCreate', async (message) => {
             await message.channel.send(`✅ قائمة المستخدمين وايموجياتهم:\n` + userList.join("\n"));
         }
     }
+
+    // Command to toggle mention auto-reply
+    if (message.content === '!toggle_mention_reply') {
+        mentionReplyEnabled = !mentionReplyEnabled;
+        await message.channel.send(`✅ Mention auto-reply is now ${mentionReplyEnabled ? 'enabled' : 'disabled'}`);
+    }
 });
 
 // Custom responses & owner mention handling
@@ -129,12 +137,6 @@ client.on('messageCreate', async (message) => {
         await message.reply(`✅ Owner mention responses are now ${ownerMentionEnabled ? 'enabled' : 'disabled'}`);
     }
 
-    // Handle mentions for specific user
-    const TARZAN_ID = '554749455669264394';
-    if (message.mentions.has(TARZAN_ID)) {
-        await message.reply('be3doli men le9reyed dyali 🚫');
-    }
-
     // Handle owner mention
     if (message.mentions.has(OWNER_ID) && ownerMentionEnabled) {
         await message.reply(ownerTagResponse);
@@ -143,3 +145,4 @@ client.on('messageCreate', async (message) => {
 
 // Log in using the token from .env
 client.login(process.env.DISCORD_TOKEN);
+
